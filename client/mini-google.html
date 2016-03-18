@@ -1,0 +1,37 @@
+<head>
+    <title>mini-google</title>
+</head>
+
+<body>
+    {{> Template.dynamic template=route}}
+</body>
+
+<template name="home">
+    <div id="search-pane">
+        <div id="search-div">
+            <img id="home-logo-img" src="logo.png"/> <br>
+            <span id="logo-name">Mini Google</span> <br id="break">
+            <input id="home-search-bar" type="text" placeholder="Search for images by keywords or other images">
+            <br id="break">
+        </div>
+    </div>
+</template>
+
+<template name="results">
+    <div id="results-pane">
+        <div id="results-div">
+            <div id="results-search-div">
+                <br id="disp">
+                <div id="image_controler">
+                    <img id="results-logo-img" src="logo.png"/>
+                </div>
+
+                <input id="results-search-bar" type="text" placeholder="Search for images by keywords or other images">
+            </div>
+
+            {{#each get_results}}
+                 <br> {{this}}
+            {{/each}}
+        </div>
+    </div>
+</template>
