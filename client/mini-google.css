@@ -1,25 +1,25 @@
 * {
 	margin: 0;
-    padding: 0;
+	padding: 0;
 }
 
 html {
-	font-family: "Ubuntu";
+	font-family: "Ubuntu", "Helvetica", "sans-serif";
 }
 
 body {
 	background: #f7f7f7;
 }
 
-#break {
+#medium {
 	display: block;
-	margin: 15px 0;
+	margin: 10px 0;
 	content: " ";
 }
 
-#disp {
+#huge {
 	display: block;
-	margin: 5px 0;
+	margin: 15px 0;
 	content: " ";
 }
 
@@ -34,9 +34,9 @@ body {
 
 #search-div {
 	width: 100%;
-	margin-bottom: 10%;
 	margin-left: 5%;
 	margin-right: 5%;
+	margin-bottom: 5%;
 	text-align: center;
 }
 
@@ -49,6 +49,9 @@ body {
 
 #results-search-div {
 	padding-left: 1%;
+	padding-top: 1%;
+	padding-bottom: 1%;
+	background: #dddddd;
 }
 
 #logo-name {
@@ -56,12 +59,18 @@ body {
 	color: #404040;
 }
 
-#results-logo-img {
-	border: 10px;
-	max-height: 30px;
+#home-logo-img {
+	width: 20%;
+	max-width: 256px;
+	height: auto;
 }
 
-#image_controler {
+#results-logo-img {
+	border: 10px;
+	max-height: 35px;
+}
+
+#image_controller {
 	float: left;
 	padding-right: 1%;
 }
@@ -87,4 +96,13 @@ body {
 	padding-left: 1%;
 	padding-right: 1%;
 	box-sizing: border-box;
+}
+
+#time-div {
+	float: right;
+	text-align: right;
+
+	height: 35px;
+	padding-right: 1%;
+	color: #4c4c4c;
 }

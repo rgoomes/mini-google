@@ -5,14 +5,18 @@ Meteor.methods({
 	'search_by_keyword': function(keyword){
 		this.unblock();
 
+		var t = Date.now();
 		var future = new Future();
 		var command = "cd " + keyword + ";ls";
 
 		exec(command, function(error, stdout, stderr){
-		    if(error)
-				future.return([]);
+			var resultset = stdout.match(/[^\n]+/g);
+			var elapsed = (Date.now() - t) / 1000.0;
 
-		    future.return(stdout.match(/[^\n]+/g));
+			if(resultset == null)
+				future.return([[], 0, elapsed]);
+			else
+				future.return([resultset, resultset.length, elapsed]);
 		});
 
 		return future.wait();

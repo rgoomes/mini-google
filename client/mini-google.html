@@ -10,9 +10,9 @@
     <div id="search-pane">
         <div id="search-div">
             <img id="home-logo-img" src="logo.png"/> <br>
-            <span id="logo-name">Mini Google</span> <br id="break">
+            <span id="logo-name">Mini Google</span> <br id="huge">
             <input id="home-search-bar" type="text" placeholder="Search for images by keywords or other images">
-            <br id="break">
+            <br id="medium">
         </div>
     </div>
 </template>
@@ -21,15 +21,15 @@
     <div id="results-pane">
         <div id="results-div">
             <div id="results-search-div">
-                <br id="disp">
-                <div id="image_controler">
+                <div id="image_controller">
                     <img id="results-logo-img" src="logo.png"/>
                 </div>
 
                 <input id="results-search-bar" type="text" placeholder="Search for images by keywords or other images">
+                <span id="time-div">Got {{get_size}} results<br>({{get_time}} seconds)</span>
             </div>
 
-            {{#each get_results}}
+            {{#each get_imgs}}
                  <br> {{this}}
             {{/each}}
         </div>
