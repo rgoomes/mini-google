@@ -16,7 +16,7 @@ var search = function(evt, template, type /* by keyword 1, or by image 0 */ ){
                 Session.set('images', res[0]);
                 Session.set('size', res[1]);
                 Session.set('time', res[2]);
-            })
+            });
         }
     }
 };

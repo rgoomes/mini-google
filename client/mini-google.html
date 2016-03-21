@@ -29,9 +29,14 @@
                 <span id="time-div">Got {{get_size}} results<br>({{get_time}} seconds)</span>
             </div>
 
-            {{#each get_imgs}}
-                 <br> {{this}}
-            {{/each}}
+            <div id="gallery">
+                {{#each get_imgs}}
+                    <div id="image_container">
+                        <img id="image" src={{this}}> <br>
+                        <span id="image_path"> {{this}} </span>
+                    </div>
+                {{/each}}
+            </div>
         </div>
     </div>
 </template>
