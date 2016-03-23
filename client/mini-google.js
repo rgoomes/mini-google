@@ -62,3 +62,5 @@ Template.results.events({
         search(evt, template, 1);
     }
 });
+
+Router.route('/', function() {});

@@ -3,24 +3,40 @@ var exec = Npm.require("child_process").exec;
 var fs = Npm.require('fs');
 
 var pwd = process.env.PWD;
-var public_images = "/public/images/";
 var server_images = "/server/images/";
 var server_path = "/server"
 
 var max_images = 100;
+var routed = {};
 
 var mkdirExists = function(dir){
 	if(!fs.existsSync(dir))
 		fs.mkdirSync(dir);
 };
 
-var sendFile = Meteor.bindEnvironment(function(img){
-	var future = new Future();
-	var cmd = "cp " + pwd+server_path+"/"+img + " " + pwd+public_images;
-	exec(cmd, function(error, stdout, stderr){ future.return(0); });
+var fail = function(response){
+	response.statusCode = 404;
+	response.end();
+};
 
-	return future.wait();
-});
+var dataFile = function() {
+	var file = pwd + server_path + this.url;
+	var stat = null;
+
+	try {
+		stat = fs.statSync(file);
+	} catch (_error) {
+		return fail(this.response);
+	}
+
+	this.response.writeHead(200, {
+		'Content-Type': 'application/jpeg',
+		'Content-Disposition': 'attachment;',
+		'Content-Length': stat.size
+	});
+
+	fs.createReadStream(file).pipe(this.response);
+};
 
 Meteor.methods({
 	'search_by_keyword': function(keyword){
@@ -41,8 +57,12 @@ Meteor.methods({
 			else {
 				resultset = resultset.slice(0, Math.min(max_images,resultset.length));
 
-				for(i = 0; i < resultset.length; i++)
-					sendFile(resultset[i]);
+				for(i = 0; i < resultset.length; i++){
+					if(routed[resultset[i]] != true){
+						Router.route('/' + resultset[i], dataFile, {where: 'server'});
+						routed[resultset[i]] = true;
+					}
+				}
 
 				future.return([resultset, resultset.length, elapsed]);
 			}
@@ -58,7 +78,6 @@ Meteor.methods({
 Meteor.startup(function () {
 	console.log('server running..');
 
-	/* Folders of images */
-	mkdirExists(pwd + public_images);
+	/* Server folder of images */
 	mkdirExists(pwd + server_images);
 });
