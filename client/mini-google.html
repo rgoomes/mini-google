@@ -1,42 +1,38 @@
 <head>
-    <title>mini-google</title>
+	<title>mini-google</title>
 </head>
 
-<body>
-    {{> Template.dynamic template=route}}
-</body>
-
 <template name="home">
-    <div id="search-pane">
-        <div id="search-div">
-            <img id="home-logo-img" src="logo.png"/> <br>
-            <span id="logo-name">Mini Google</span> <br id="huge">
-            <input id="home-search-bar" type="text" placeholder="Search for images by keywords or other images">
-            <br id="medium">
-        </div>
-    </div>
+	<div id="search-pane">
+		<div id="search-div">
+			<img id="home-logo-img" src="logo.png"/> <br>
+			<span id="logo-name">Mini Google</span> <br id="huge">
+			<input id="home-search-bar" type="text" placeholder="Search for images by keywords or other images">
+			<br id="medium">
+		</div>
+	</div>
 </template>
 
 <template name="results">
-    <div id="results-pane">
-        <div id="results-div">
-            <div id="results-search-div">
-                <div id="image_controller">
-                    <img id="results-logo-img" src="logo.png"/>
-                </div>
+	<div id="results-pane">
+		<div id="results-div">
+			<div id="results-search-div">
+				<div id="image_controller">
+					<img id="results-logo-img" src="logo.png"/>
+				</div>
 
-                <input id="results-search-bar" type="text" placeholder="Search for images by keywords or other images">
-                <span id="time-div">Got {{get_size}} results<br>({{get_time}} seconds)</span>
-            </div>
+				<input id="results-search-bar" type="text" placeholder="Search for images by keywords or other images">
+				<span id="time-div">Got {{get_size}} results<br>({{get_time}} seconds)</span>
+			</div>
 
-            <div id="gallery">
-                {{#each get_imgs}}
-                    <div id="image_container">
-                        <img id="image" src={{this}}> <br>
-                        <span id="image_path"> {{this}} </span>
-                    </div>
-                {{/each}}
-            </div>
-        </div>
-    </div>
+			<div id="gallery">
+				{{#each get_imgs}}
+					<div id="image_container">
+						<img id="image" src={{this}}> <br>
+						<span id="image_path"> {{this}} </span>
+					</div>
+				{{/each}}
+			</div>
+		</div>
+	</div>
 </template>

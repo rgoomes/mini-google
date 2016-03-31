@@ -39,6 +39,11 @@ var dataFile = function() {
 };
 
 Meteor.methods({
+	'get_type': function(value){
+		try {
+			return fs.statSync(value).isFile();
+		} catch (e){ return false; }
+	},
 	'search_by_keyword': function(keyword){
 		this.unblock();
 
@@ -72,6 +77,7 @@ Meteor.methods({
 	},
 	'search_by_image': function(path){
 		this.unblock();
+		return [[], 0, 0.0];
 	}
 });
 
