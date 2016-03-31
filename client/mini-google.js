@@ -6,10 +6,11 @@ var request = '';
 
 var search = function(evt){
 	if(evt.target.value && evt.target.value.length && evt.which === 13){
+		request = evt.target.value;
 		Router.go('/results');
 
-		Meteor.call('get_type', evt.target.value, function(err, res1){
-			Meteor.call(!res1 ? 'search_by_keyword' : 'search_by_image', evt.target.value, function(err, res2){
+		Meteor.call('get_type', request, function(err, res1){
+			Meteor.call(!res1 ? 'search_by_keyword' : 'search_by_image', request, function(err, res2){
 				Session.set('images', res2[0]);
 				Session.set('size', res2[1]);
 				Session.set('time', res2[2]);

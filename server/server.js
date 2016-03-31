@@ -3,7 +3,8 @@ var exec = Npm.require("child_process").exec;
 var fs = Npm.require('fs');
 
 var pwd = process.env.PWD;
-var server_images = "/server/images/";
+var spark_path = "/server/.spark-1.6.0-bin-hadoop2.6/";
+var server_images = "/server/.images/";
 var server_path = "/server"
 
 var max_images = 100;
@@ -49,7 +50,7 @@ Meteor.methods({
 
 		var t = Date.now();
 		var future = new Future();
-		var cmd = "find " + pwd+server_images + " -type f -printf 'images/%f\n'";
+		var cmd = "find " + pwd+server_images + " -type f -printf '.images/%f\n'";
 
 		exec(cmd, function(error, stdout, stderr){
 			if(error) future.return([[], 0, 0]);
@@ -81,8 +82,12 @@ Meteor.methods({
 	}
 });
 
-Meteor.startup(function () {
-	console.log('server running..');
+Meteor.startup(function(){
+	/* Spark folder */
+	if(!fs.existsSync(pwd + spark_path)){
+		console.log('error: spark not found');
+		//process.exit(0);
+	}
 
 	/* Server folder of images */
 	mkdirExists(pwd + server_images);
