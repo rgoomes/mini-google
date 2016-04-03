@@ -8,7 +8,12 @@ from sys import argv
 if len(argv) >= 2 and len(argv[1]):
 	s = socket()
 	s.connect((gethostname(), 12345))
-	s.send(argv[1] + " " + (argv[2] if len(argv) > 2 else ""))
-	request = s.recv(256)
+
+	keywords = ""
+	for i in range(1, len(argv)):
+		keywords += argv[i] + " "
+
+	s.send(keywords[:-1])
+	request = s.recv(4096)
 	print(request, end="")
 	s.close()

@@ -6,13 +6,16 @@ from pyspark.sql.types import Row, StructField, StructType, StringType, IntegerT
 
 import socket, os, sys
 
-def keyword_search(keyword):
-	query = "SELECT name FROM imagesTable WHERE keyword=\'" + keyword + "\'"
+def keyword_search(keywords):
+	query = "SELECT name FROM imagesTable WHERE keyword = \'" + keywords[0] + "\' "
+	for i in range(1, len(keywords)):
+		query += "OR keyword = \'" + keywords[i] + "\' "
+
 	imgdf = sqlContext.sql(query)
 
 	results = ""
 	for img in imgdf.collect():
-		results += ".images/" + str(img.name) + " "
+		results += str(img.name) + " "
 
 	return results[:-1]
 
@@ -44,16 +47,20 @@ def server():
 
 	while True:
 		c, addr = s.accept()
-		job = c.recv(256).split(" ")
+		job = c.recv(1024).split(" ")
 
 		if job[0] == "exit":
 			c.close()
 			break
-		if job[0] not in ["keyword", "image"] or not len(job[1]):
+		if job[0] not in ["keyword", "image"] or len(job) < 2:
 			c.close()
 			continue
 
-		request = keyword_search(job[1])
+		#FIXME: client request might excede 4096 bytes. two possible
+		#solutions: do several send's here and receive's on the client
+		#or limit the results and send the number of results in the request
+
+		request = keyword_search(job[1:])
 		c.send(request)
 		c.close()
 

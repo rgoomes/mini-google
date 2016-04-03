@@ -78,6 +78,8 @@ Meteor.methods({
 					resultset = resultset.slice(0, Math.min(max_images, setlength));
 
 					for(i = 0; i < resultset.length; i++){
+						resultset[i] = '.images/' + resultset[i]
+
 						if(routed[resultset[i]] != true){
 							Router.route(resultset[i], dataFile, {where: 'server'});
 							routed[resultset[i]] = true;
