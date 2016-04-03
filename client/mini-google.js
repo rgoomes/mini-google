@@ -4,8 +4,11 @@ Session.setDefault('size', 0);
 
 var request = '';
 
-var search = function(evt){
+var search = function(evt, page){
 	if(evt.target.value && evt.target.value.length && evt.which === 13){
+		if(page == "home")
+			Session.set('images', []);
+
 		request = evt.target.value;
 		Router.go('/results');
 
@@ -16,7 +19,6 @@ var search = function(evt){
 				Session.set('time', res2[2]);
 			});
 		});
-
 	}
 };
 
@@ -31,7 +33,7 @@ Template.home.rendered = function(){
 
 Template.home.events({
 	'keypress #home-search-bar': function (evt, template){
-		search(evt);
+		search(evt, "home");
 	}
 });
 
@@ -53,7 +55,7 @@ Template.results.helpers({
 
 Template.results.events({
 	'keypress #results-search-bar': function (evt, template){
-		search(evt);
+		search(evt, "results");
 	}
 });
 

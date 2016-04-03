@@ -1,3 +1,8 @@
 # Folders with the images
 server/.images
+
+# Spark Folder
 server/.spark-1.6.0-bin-hadoop2.6
+
+# Spark Database
+server/images.parquet/

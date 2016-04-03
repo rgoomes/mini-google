@@ -20,7 +20,7 @@ var fail = function(response){
 	response.end();
 };
 
-var dataFile = function() {
+var dataFile = function(){
 	var file = pwd + server_path + this.url;
 	var stat = null;
 
@@ -39,38 +39,53 @@ var dataFile = function() {
 	fs.createReadStream(file).pipe(this.response);
 };
 
+var startSparkServer = function() {
+	var cmd = "python " + pwd+server_path + "/server_spark.py --save --path " + pwd+server_path;
+
+	exec(cmd, function(error, stdout, stderr){
+		if(error)
+			console.log('error: failed to start spark');
+	});
+};
+
 Meteor.methods({
 	'get_type': function(value){
 		try {
 			return fs.statSync(value).isFile();
-		} catch (e){ return false; }
+		} catch (e){
+			return false;
+		}
 	},
 	'search_by_keyword': function(keyword){
 		this.unblock();
 
 		var t = Date.now();
 		var future = new Future();
-		var cmd = "find " + pwd+server_images + " -type f -printf '.images/%f\n'";
+		var cmd = "python -S " + pwd+server_path + "/client_spark.py keyword " + keyword;
 
 		exec(cmd, function(error, stdout, stderr){
-			if(error) future.return([[], 0, 0]);
-
 			var elapsed = (Date.now() - t) / 1000.0;
-			var resultset = stdout.match(/[^\n]+/g);
 
-			if(resultset == null)
-				future.return([[], 0, elapsed]);
-			else {
-				resultset = resultset.slice(0, Math.min(max_images,resultset.length));
+			if(error){
+				console.log('error: client spark failed');
+				future.return([[], 0, 0]);
+			} else {
+				if(stdout == null || stdout.length == 0)
+					future.return([[], 0, elapsed]);
+				else {
+					var resultset = stdout.split(" ");
+					var setlength = resultset.length;
+					resultset = resultset.slice(0, Math.min(max_images, setlength));
 
-				for(i = 0; i < resultset.length; i++){
-					if(routed[resultset[i]] != true){
-						Router.route('/' + resultset[i], dataFile, {where: 'server'});
-						routed[resultset[i]] = true;
+					for(i = 0; i < resultset.length; i++){
+						if(routed[resultset[i]] != true){
+							Router.route(resultset[i], dataFile, {where: 'server'});
+							routed[resultset[i]] = true;
+						}
 					}
-				}
 
-				future.return([resultset, resultset.length, elapsed]);
+					future.return([resultset, setlength, elapsed]);
+				}
 			}
 		});
 
@@ -87,7 +102,8 @@ Meteor.startup(function(){
 	if(!fs.existsSync(pwd + spark_path)){
 		console.log('error: spark not found');
 		//process.exit(0);
-	}
+	} else
+		startSparkServer()
 
 	/* Server folder of images */
 	mkdirExists(pwd + server_images);
