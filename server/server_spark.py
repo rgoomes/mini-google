@@ -23,7 +23,7 @@ def image_search():
 	return ''
 
 def save_tables(sc, sqlContext, home_path):
-	lines = sc.textFile("dataset.csv")
+	lines = sc.textFile(home_path + "/dataset.csv")
 	entry = lines.map(lambda p: p.split(","))
 	images = entry.map(lambda p: Row(name=p[1], keyword=p[0]))
 
@@ -61,6 +61,7 @@ def server():
 		#or limit the results and send the number of results in the request
 
 		request = keyword_search(job[1:])
+		print request
 		c.send(request)
 		c.close()
 
