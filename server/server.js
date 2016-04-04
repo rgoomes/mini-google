@@ -56,12 +56,12 @@ Meteor.methods({
 			return false;
 		}
 	},
-	'search_by_keyword': function(keyword){
+	'request_search': function(keyword, type){
 		this.unblock();
 
 		var t = Date.now();
 		var future = new Future();
-		var cmd = "python -S " + pwd+server_path + "/client_spark.py keyword " + keyword;
+		var cmd = "python -S " + pwd+server_path + "/client_spark.py " + type + " " + keyword;
 
 		exec(cmd, function(error, stdout, stderr){
 			var elapsed = (Date.now() - t) / 1000.0;
@@ -92,10 +92,6 @@ Meteor.methods({
 		});
 
 		return future.wait();
-	},
-	'search_by_image': function(path){
-		this.unblock();
-		return [[], 0, 0.0];
 	}
 });
 

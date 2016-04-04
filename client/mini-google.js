@@ -13,7 +13,8 @@ var search = function(evt, page){
 		Router.go('/results');
 
 		Meteor.call('get_type', request, function(err, res1){
-			Meteor.call(!res1 ? 'search_by_keyword' : 'search_by_image', request, function(err, res2){
+			type = !res1 ? 'keyword' : 'image';
+			Meteor.call('request_search', request, type, function(err, res2){
 				Session.set('images', res2[0]);
 				Session.set('size', res2[1]);
 				Session.set('time', res2[2]);

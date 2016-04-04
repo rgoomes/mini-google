@@ -19,7 +19,7 @@ def keyword_search(keywords):
 
 	return results[:-1]
 
-def image_search():
+def image_search(path):
 	return ''
 
 def save_tables(sc, sqlContext, home_path):
@@ -60,8 +60,11 @@ def server():
 		#solutions: do several send's here and receive's on the client
 		#or limit the results and send the number of results in the request
 
-		request = keyword_search(job[1:])
-		print request
+		if job[0] == "keyword":
+			request = keyword_search(job[1:])
+		elif job[0] == "image":
+			request = image_search(job[1])
+
 		c.send(request)
 		c.close()
 
