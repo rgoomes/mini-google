@@ -96,6 +96,9 @@ Meteor.methods({
 });
 
 Meteor.startup(function(){
+	/* Server folder of images */
+	mkdirExists(pwd + server_images);
+
 	/* Spark folder */
 	if(!fs.existsSync(pwd + spark_path)){
 		console.log('error: spark not found');
@@ -103,6 +106,4 @@ Meteor.startup(function(){
 	} else
 		startSparkServer()
 
-	/* Server folder of images */
-	mkdirExists(pwd + server_images);
 });
