@@ -40,7 +40,7 @@ var dataFile = function(){
 };
 
 var startSparkServer = function() {
-	var cmd = "python " + pwd+server_path + "/server_spark.py --save --path " + pwd+server_path;
+	var cmd = "python3 " + pwd+server_path + "/server_spark.py --save --path " + pwd+server_path;
 
 	exec(cmd, function(error, stdout, stderr){
 		if(error)
@@ -61,7 +61,7 @@ Meteor.methods({
 
 		var t = Date.now();
 		var future = new Future();
-		var cmd = "python -S " + pwd+server_path + "/client_spark.py " + type + " " + keyword;
+		var cmd = "python3 -S " + pwd+server_path + "/client_spark.py " + type + " " + keyword;
 
 		exec(cmd, function(error, stdout, stderr){
 			var elapsed = (Date.now() - t) / 1000.0;
