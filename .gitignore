@@ -6,3 +6,11 @@ server/.spark-1.6.0-bin-hadoop2.6
 
 # Spark Database
 server/images.parquet/
+
+#DS_Stores
+.DS_Store
+server/.DS_Store
+
+#pyc Files
+server/*.pyc
+server/__pycache__/
