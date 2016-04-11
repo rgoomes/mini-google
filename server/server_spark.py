@@ -16,9 +16,9 @@ def keyword_search(keywords):
 		query += "OR keyword = \'" + keywords[i] + "\' "
 
 	imgdf = sqlContext.sql(query)
+	results = str(imgdf.count()) + " "
 
-	results = ""
-	for img in imgdf.collect():
+	for img in imgdf.limit(100).collect():
 		results += str(img.name) + " "
 
 	return results[:-1]
@@ -64,10 +64,6 @@ def server():
 		if job[0] not in ["keyword", "image"] or len(job) < 2:
 			c.close()
 			continue
-
-		#FIXME: client request might excede 4096 bytes. two possible
-		#solutions: do several send's here and receive's on the client
-		#or limit the results and send the number of results in the request
 
 		if job[0] == "keyword":
 			request = keyword_search(job[1:])

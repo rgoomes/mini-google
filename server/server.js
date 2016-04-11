@@ -74,8 +74,7 @@ Meteor.methods({
 					future.return([[], 0, elapsed]);
 				else {
 					var resultset = stdout.split(" ");
-					var setlength = resultset.length;
-					resultset = resultset.slice(0, Math.min(max_images, setlength));
+					var nresults = resultset.shift();
 
 					for(i = 0; i < resultset.length; i++){
 						resultset[i] = '.images/' + resultset[i]
@@ -86,7 +85,7 @@ Meteor.methods({
 						}
 					}
 
-					future.return([resultset, setlength, elapsed]);
+					future.return([resultset, nresults, elapsed]);
 				}
 			}
 		});
