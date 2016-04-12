@@ -5,10 +5,9 @@ from pyspark.sql import SQLContext
 from pyspark.sql.types import Row, StructField, StructType, StringType, IntegerType
 from classifier import *
 from features import *
-
 import socket, os, sys
 
-global nn, n, keywords
+global nn, n, ckeywords
 
 def keyword_search(keywords):
 	query = "SELECT name FROM imagesTable WHERE keyword = \'" + keywords[0] + "\' "
@@ -24,14 +23,20 @@ def keyword_search(keywords):
 	return results[:-1]
 
 def image_search(path):
-	global nn, keywords
-	im = Image.open(path).convert('RGB')
+	global nn, ckeywords
+
+	try:
+		im = Image.open(path)
+	except:
+		return "0"
+
+	im = im.convert('RGB')
 	feats = get_img_feats(im)
 	out = nn.activate(feats)
-	clss = process_nn_output(out, keywords)
+	clss = process_nn_output(out, ckeywords)
 	return keyword_search([clss])
 
-def save_tables(sc, sqlContext, home_path):
+def save_tables(home_path):
 	lines = sc.textFile(home_path + "/dataset.csv")
 	entry = lines.map(lambda p: p.split(","))
 	images = entry.map(lambda p: Row(name=p[1], keyword=p[0]))
@@ -42,7 +47,7 @@ def save_tables(sc, sqlContext, home_path):
 	schemaImages = sqlContext.createDataFrame(images, schema)
 	schemaImages.write.parquet(home_path + "/images.parquet")
 
-def load_tables(sc, sqlContext, home_path):
+def load_tables(home_path):
 	parquetFile = sqlContext.read.parquet(home_path + "/images.parquet")
 	parquetFile.registerTempTable("imagesTable");
 
@@ -75,28 +80,31 @@ def server():
 
 	s.close()
 
-if __name__ == "__main__":
-	if "--path" not in sys.argv or sys.argv.index('--path')+1 == len(sys.argv):
-		print('error: server path not given')
-		sys.exit(-1)
-
-	sc = SparkContext(appName="mini-google")
-	sqlContext = SQLContext(sc)
-
-	home_path = sys.argv[sys.argv.index('--path') + 1]
+def prepare(home_path):
 	if "--save" in sys.argv and not os.path.isdir(home_path + "/images.parquet"):
-		save_tables(sc, sqlContext, home_path)
+		save_tables(home_path)
 
 	if not os.path.isdir(home_path + "/images.parquet"):
 		print('error: database not found')
 		sys.exit(-1)
 
-	load_tables(sc, sqlContext, home_path)
+	load_tables(home_path)
 
-	data, n, keywords = gen_data(home_path + '/dataset.csv', home_path + '/.images')
+	global nn, ckeywords
+	data, n, ckeywords = gen_data(home_path + '/dataset.csv', home_path + '/.images')
 	nn = gen_nn(768, n, n)
 	nn = train_nn(data, nn, 50)
 
-	server()
+if __name__ == "__main__":
+	if "--path" not in sys.argv or sys.argv.index('--path')+1 == len(sys.argv):
+		print('error: server path not given')
+		sys.exit(-1)
 
+	home_path = sys.argv[sys.argv.index('--path') + 1]
+
+	sc = SparkContext(appName="mini-google")
+	sqlContext = SQLContext(sc)
+
+	prepare(home_path)
+	server()
 	sc.stop()

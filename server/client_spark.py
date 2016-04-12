@@ -1,5 +1,6 @@
 #!/usr/bin/python
-#usage example: python client_spark.py keyword orange
+#usage example 1: python client_spark.py keyword orange
+#usage example 2: python client_spark.py image /path
 
 from socket import socket, gethostname
 from sys import argv

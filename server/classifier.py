@@ -40,7 +40,7 @@ def train_nn(data, nn, epochs):
 	trainer.trainEpochs(epochs)
 	return nn
 
-'''def benchmark(nn, keywords, db_path):
+def benchmark(nn, keywords, db_path):
 	neg = pos = 0.0
 	content = os.listdir(db_path)
 	for img in content:
@@ -54,5 +54,5 @@ def train_nn(data, nn, epochs):
 				pos += 1
 			else:
 				neg += 1	
-	print('Overall Performance: ' + str((pos / (pos + neg)) * 100) + '%')'''
+	print('Overall Performance: ' + str((pos / (pos + neg)) * 100) + '%')
 	

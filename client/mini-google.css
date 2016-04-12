@@ -11,6 +11,12 @@ body {
 	background: #f7f7f7;
 }
 
+#small {
+	display: block;
+	margin: 2px 0;
+	content: " ";
+}
+
 #medium {
 	display: block;
 	margin: 10px 0;
