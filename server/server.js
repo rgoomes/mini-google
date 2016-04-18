@@ -39,15 +39,6 @@ var dataFile = function(){
 	fs.createReadStream(file).pipe(this.response);
 };
 
-var startSparkServer = function() {
-	var cmd = "python3 " + pwd+server_path + "/server_spark.py --save --path " + pwd+server_path;
-
-	exec(cmd, function(error, stdout, stderr){
-		if(error)
-			console.log('error: failed to start spark');
-	});
-};
-
 Meteor.methods({
 	'get_type': function(value){
 		try {
@@ -61,7 +52,7 @@ Meteor.methods({
 
 		var t = Date.now();
 		var future = new Future();
-		var cmd = "python3 -S " + pwd+server_path + "/client_spark.py " + type + " " + keyword;
+		var cmd = "python3 -S " + pwd+server_path + "/client.py " + type + " " + keyword;
 
 		exec(cmd, function(error, stdout, stderr){
 			var elapsed = (Date.now() - t) / 1000.0;
@@ -97,12 +88,4 @@ Meteor.methods({
 Meteor.startup(function(){
 	/* Server folder of images */
 	mkdirExists(pwd + server_images);
-
-	/* Spark folder */
-	if(!fs.existsSync(pwd + spark_path)){
-		console.log('error: spark not found');
-		//process.exit(0);
-	} else
-		startSparkServer()
-
 });
