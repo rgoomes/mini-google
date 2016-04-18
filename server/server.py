@@ -32,6 +32,7 @@ def spark_thread(ip, port, request):
 	s = socket.socket()
 
 	try:
+		ip = socket.gethostname() if ip == '127.0.0.1' else ip
 		s.connect((ip, int(port)))
 	except:
 		s.close()
@@ -41,7 +42,6 @@ def spark_thread(ip, port, request):
 
 	s.send(request.encode())
 	rec = s.recv(4096).decode()
-	print(rec)
 	rec2 = rec.split()
 	
 	response_count += int(rec2[0])
@@ -69,8 +69,11 @@ def client_thread(c, request):
 	for i in range(clusters):
 		spark_threads[i].join()
 
-	finall = (str(response_count) + " " + response[:-1])
-	print(finall)
+	if response_count != 0:
+		finall = (str(response_count) + " " + response[:-1])
+	else:
+		finall = "0"
+
 	c.send(finall.encode())
 	c.close()
 
@@ -98,8 +101,7 @@ def server():
 			request = ' '.join([i for i in request])
 		elif job[0] == "image":
 			request = image_search(job[1])
-		
-		print(request)
+
 		if request == "0":
 			c.send("0".encode())
 			c.close()
