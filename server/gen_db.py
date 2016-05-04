@@ -17,12 +17,12 @@ def gen_db():
 	os.mkdir('.images')
 	for db in dir_list:
 		ctg_list = next(os.walk(db + '/.'))[1]
-		for c in ctg_list[:2]:
+		for c in ctg_list:
 			ctg = parse_ctg(c)
 			for img in os.listdir(db + '/' + c):
 				if '.jpg' in img:
 					os.system('cp ' + db + '/' + c + '/' + img + ' .images/' + str(img_count) + '.jpg')
-					f.write(str(img_count) + '.jpg' + ',' + c + '\n')
+					f.write(str(img_count) + '.jpg' + ',' + ctg + '\n')
 					img_count += 1
 	f.close()
 
