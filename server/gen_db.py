@@ -13,10 +13,11 @@ def gen_db():
 	f = open('dataset.csv', 'w+')
 	img_count = 0
 
-	dir_list = next(os.walk('.'))[1]
+	dir_list = ['256_ObjectCategories']
 	os.mkdir('.images')
 	for db in dir_list:
 		ctg_list = next(os.walk(db + '/.'))[1]
+		ctg_list.sort()
 		for c in ctg_list:
 			ctg = parse_ctg(c)
 			for img in os.listdir(db + '/' + c):
