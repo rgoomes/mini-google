@@ -50,21 +50,19 @@ Meteor.methods({
 	'request_search': function(keyword, type){
 		this.unblock();
 
-		var t = Date.now();
 		var future = new Future();
 		var cmd = "python3 -S " + pwd+server_path + "/client.py " + type + " " + keyword;
 
 		exec(cmd, function(error, stdout, stderr){
-			var elapsed = (Date.now() - t) / 1000.0;
-
 			if(error){
 				console.log('error: client spark failed');
 				future.return([[], 0, 0]);
 			} else {
 				if(stdout == null || stdout.length == 0)
-					future.return([[], 0, elapsed]);
+					future.return([[], 0, 0.0]);
 				else {
 					var resultset = stdout.split(" ");
+					var elapsed = resultset.shift();
 					var nresults = resultset.shift();
 
 					for(i = 0; i < resultset.length; i++){

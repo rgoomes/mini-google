@@ -13,7 +13,7 @@ def keyword_search(keywords):
 		query += "OR keyword = \'" + keywords[i] + "\' "
 
 	imgdf = sqlContext.sql(query)
-	results = str(imgdf.count()) + " "
+	results = str(imgdf.count()) + "\n"
 
 	for img in imgdf.limit(100).collect():
 		results += str(img.name) + " "
@@ -39,6 +39,7 @@ def spark_server(port):
 		print("Client connected: " + str(addr))
 		ct = Thread(target = client_thread, args = (cs, ))
 		ct.start()
+
 	s.close()
 
 def save_tables(home_path, n_machines, m_id):

@@ -14,7 +14,8 @@ if len(argv) >= 2 and len(argv[1]):
 		keywords += argv[i] + " "
 
 	s.send(keywords[:-1].encode())
-	request = s.recv(4096).decode()
-	print(request, end="")
+
+	data = s.recv(4096)
+	print(data.decode(), end="")
 	s.close()
 
