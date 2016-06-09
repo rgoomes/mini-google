@@ -126,6 +126,6 @@ def read_conf():
 	parser.read("server.conf")
 
 if __name__ == '__main__':
-	neural_network()
+	#neural_network()
 	read_conf()
 	server()
