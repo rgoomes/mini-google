@@ -15,5 +15,3 @@ server/.DS_Store
 server/*.pyc
 server/__pycache__/
 
-# conf files
-*.conf
