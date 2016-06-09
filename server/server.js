@@ -48,7 +48,7 @@ Meteor.methods({
 		}
 	},
 	'request_search': function(keyword, type){
-		this.unblock();
+		//this.unblock();
 
 		var future = new Future();
 		var cmd = "python3 -S " + pwd+server_path + "/client.py " + type + " " + keyword;
