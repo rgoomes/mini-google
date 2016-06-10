@@ -52,7 +52,7 @@ def mysql_server(port):
 
 def save_tables(home_path, n_machines, m_id):
 	with open(home_path + '/big_dataset.csv') as f:
-		content = f.readlines()
+		content = f.read().splitlines()
 	f.close()
 
 	data_size = int(floor(len(content) / n_machines))
@@ -65,24 +65,40 @@ def save_tables(home_path, n_machines, m_id):
 	else:
 		content = content[start_index : start_index + data_size]
 
+	# MySQL conf file: my.cnf
+	# autocommit = OFF
+	# innodb_doublewrite = 0
+	# innodb_flush_log_at_trx_commit=0
+	# innodb_buffer_pool_size = 536870912
+
+	# ALSO type in mysql command line:
+	# SET sql_log_bin = 0;
+
 	cur.execute("DROP INDEX keywordIndex ON image;")
-	conn.commit();
 	cur.execute("delete from image;")
-	conn.commit()
 
 	count, length = 0, len(content)
+	query = "INSERT INTO image (name, keyword) VALUES (%s, %s)"
 
-	for c in content:
-		print_status("images", count+1, length)
-		count += 1
+	if "--bulk" in sys.argv:
+		# NEED to set max_allowed_packet in mysql command line:
+		# SET GLOBAL max_allowed_packet=536870912;
 
-		d = c.split()
-		d = d[0].split(',')
+		items = []
+		for i in xrange(length):
+			d = content[i].split(',')
+			items.append((d[0], d[1]))
 
-		cmd = "INSERT INTO image (name, keyword) VALUES (" + "'" + d[0] + "', '" + d[1] + "');"
-		cur.execute(cmd)
+		del content
+		cur.executemany(query, items)
+	else:
+		for i in xrange(length):
+			print_status("images", count+1, length)
+			count += 1
 
-	conn.commit()
+			d = content[i].split(',')
+			cur.execute(query, (d[0], d[1],))
+
 	cur.execute("CREATE INDEX keywordIndex ON image (keyword) USING BTREE;")
 	conn.commit();
 
