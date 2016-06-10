@@ -33,7 +33,7 @@ def image_search(path):
 	try:
 		im = Image.open(path)
 	except:
-		return "0"
+		return None
 
 	im = im.convert('RGB')
 	feats = get_img_feats(im)
@@ -63,6 +63,12 @@ def spark_thread(ip, port, request, result):
 	s.close()
 
 def client_thread(c, request):
+	if request == None:
+		data = '0.0 0 0'
+		c.send(data.encode())
+		c.close()
+		return
+
 	result = Result()
 	clusters = int(parser.get('config', 'clusters'))
 	
@@ -116,9 +122,9 @@ def server():
 
 def neural_network():
 	global nn, ckeywords
-	data, n, ckeywords = gen_data(os.getcwd() + '/dataset.csv', os.getcwd() + '/.images')
+	data, n, ckeywords = gen_data(os.getcwd() + '/train.csv', os.getcwd() + '/.images')
 	nn = gen_nn(768, n, n)
-	nn = train_nn(data, nn, 50)
+	nn = train_nn(data, nn, 10)
 
 def read_conf():
 	global parser

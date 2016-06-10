@@ -10,6 +10,9 @@ def print_status(table, pos, length):
 	sys.stdout.write("\033[K\r" + table + " " + str(pos) + "/" + str(length))
 	sys.stdout.flush()
 
+	if pos == length:
+		print(end='\n')
+
 def keyword_search(keywords):
 	cmd = "SELECT name FROM image WHERE keyword = \'" + keywords[0] + "\' "
 	for i in range(1, len(keywords)):
@@ -34,6 +37,7 @@ def client_thread(cs):
 
 def mysql_server(port):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	s.bind((socket.gethostname(), port))
 	s.listen(10)
 
@@ -47,7 +51,7 @@ def mysql_server(port):
 	s.close()
 
 def save_tables(home_path, n_machines, m_id):
-	with open(home_path + '/dataset.csv') as f:
+	with open(home_path + '/big_dataset.csv') as f:
 		content = f.readlines()
 	f.close()
 
@@ -61,6 +65,8 @@ def save_tables(home_path, n_machines, m_id):
 	else:
 		content = content[start_index : start_index + data_size]
 
+	cur.execute("DROP INDEX keywordIndex ON image;")
+	conn.commit();
 	cur.execute("delete from image;")
 	conn.commit()
 
@@ -77,7 +83,8 @@ def save_tables(home_path, n_machines, m_id):
 		cur.execute(cmd)
 
 	conn.commit()
-
+	cur.execute("CREATE INDEX keywordIndex ON image (keyword) USING BTREE;")
+	conn.commit();
 
 def prepare(home_path, n_machines, m_id):
 	global conn, cur

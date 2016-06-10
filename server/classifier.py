@@ -35,8 +35,7 @@ def gen_nn(in_size, hidden_size, out_size):
 	return nn
 
 def train_nn(data, nn, epochs):
-	#Verbose=True to print error
-	trainer = BackpropTrainer(nn, dataset=data, momentum=0.1, verbose=False, weightdecay=0.01)
+	trainer = BackpropTrainer(nn, dataset=data, momentum=0.1, verbose=True, weightdecay=0.01)
 	trainer.trainEpochs(epochs)
 	return nn
 
