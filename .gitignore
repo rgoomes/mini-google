@@ -15,3 +15,5 @@ server/.DS_Store
 server/*.pyc
 server/__pycache__/
 
+# Datasets
+*.csv
