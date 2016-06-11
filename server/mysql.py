@@ -1,5 +1,5 @@
 from __future__ import print_function
-import socket, sys, os, MySQLdb
+import socket, sys, os, MySQLdb, itertools
 import ConfigParser as configparser
 from threading import Thread
 from math import floor
@@ -51,46 +51,56 @@ def mysql_server(port):
 	s.close()
 
 def save_tables(home_path, n_machines, m_id):
-	with open(home_path + '/big_dataset.csv') as f:
-		content = f.read().splitlines()
-	f.close()
+	dataset = home_path + '/big_dataset.csv'
 
-	data_size = int(floor(len(content) / n_machines))
-	start_index = 0
-	for i in range(m_id):
-		start_index += data_size
+	with open(dataset) as f:
+		file_lines = sum(1 for _ in f)
 
-	if m_id == n_machines - 1:
-		content = content[start_index : ]
-	else:
-		content = content[start_index : start_index + data_size]
+	data_size = file_lines / n_machines
+	beg = m_id * data_size
+	end = file_lines if m_id == n_machines-1 else beg + data_size
 
-	# MySQL conf file: my.cnf
-	# autocommit = OFF
-	# innodb_doublewrite = 0
-	# innodb_flush_log_at_trx_commit=0
-	# innodb_buffer_pool_size = 536870912
+	with open(dataset) as f:
+		content = [l.strip() for l in itertools.islice(f, beg, end)]
 
-	# ALSO type in mysql command line:
-	# SET sql_log_bin = 0;
+	# counter and content length
+	count, length = 0, len(content)
+	# Disable MySQL autocommit
+	conn.autocommit(False)
 
 	cur.execute("DROP INDEX keywordIndex ON image;")
+	conn.commit();
 	cur.execute("delete from image;")
+	conn.commit()
 
-	count, length = 0, len(content)
 	query = "INSERT INTO image (name, keyword) VALUES (%s, %s)"
 
 	if "--bulk" in sys.argv:
 		# NEED to set max_allowed_packet in mysql command line:
 		# SET GLOBAL max_allowed_packet=536870912;
 
-		items = []
-		for i in xrange(length):
-			d = content[i].split(',')
-			items.append((d[0], d[1]))
+		batchs_pos = sys.argv.index('--bulk')+1
+		if batchs_pos == len(sys.argv) or not sys.argv[batchs_pos].isdigit():
+			print("error: invalid or incomplete batch number in option --bulk")
+			exit(0)
 
-		del content
-		cur.executemany(query, items)
+		batchs = int(sys.argv[batchs_pos])
+		batchs = min(max(1, batchs), 64)
+		batch_size = length / batchs
+
+		for batch in range(batchs):
+			print_status("batchs", count+1, batchs)
+			count += 1
+
+			items = []
+			lb = batch * batch_size
+			ub = lb + (length-lb if batch == batchs-1 else batch_size)
+
+			for i in xrange(lb, ub):
+				d = content[i].split(',')
+				items.append((d[0], d[1]))
+
+			cur.executemany(query, items)
 	else:
 		for i in xrange(length):
 			print_status("images", count+1, length)
@@ -99,6 +109,7 @@ def save_tables(home_path, n_machines, m_id):
 			d = content[i].split(',')
 			cur.execute(query, (d[0], d[1],))
 
+	conn.commit();
 	cur.execute("CREATE INDEX keywordIndex ON image (keyword) USING BTREE;")
 	conn.commit();
 

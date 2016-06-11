@@ -127,11 +127,16 @@ def neural_network():
 	nn = train_nn(data, nn, 10)
 
 def read_conf():
+	if "--conf" not in sys.argv or sys.argv.index('--conf')+1 == len(sys.argv):
+		print("error: missing or invalid option --conf")
+		exit(0)
+
 	global parser
 	parser = configparser.ConfigParser()
-	parser.read("server.conf")
+	conf_file = sys.argv[sys.argv.index('--conf')+1]
+	parser.read(conf_file)
 
 if __name__ == '__main__':
-	neural_network()
+	#neural_network()
 	read_conf()
 	server()
