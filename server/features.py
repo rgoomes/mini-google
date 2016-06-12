@@ -1,17 +1,5 @@
-import PIL, os, sys
-from PIL import Image
-from pybrain.datasets import ClassificationDataSet
-
-def get_keyword_class(kw_ind, n):
-	aux = [0 for i in range(n)]
-	aux[kw_ind] = 1
-	return aux
-
-def get_color_hist(img):
-	return img.histogram()
-
-def get_img_feats(img):
-	return get_color_hist(img)
+import os, sys
+from PIL import *
 
 def print_status(table, pos, length):
 	sys.stdout.write("\033[K\r" + table + " " + str(pos) + "/" + str(length))
@@ -19,6 +7,12 @@ def print_status(table, pos, length):
 
 	if pos == length:
 		print(end='\n')
+
+def get_color_hist(img):
+	return img.histogram()
+
+def get_img_feats(img):
+	return get_color_hist(img)
 
 def gen_data(csv_file, db):
 	keywords = {}
@@ -29,7 +23,6 @@ def gen_data(csv_file, db):
 
 	with open(csv_file) as f:
 		content = f.readlines()
-	f.close()
 
 	for line in content:
 		aux = line.replace('\n', '').split(',')
@@ -38,7 +31,6 @@ def gen_data(csv_file, db):
 			count += 1
 		img_list.append(aux)
 
-	data = ClassificationDataSet(768, len(keywords), nb_classes=len(keywords))
 	n = len(keywords)
 	count = 0
 
@@ -48,9 +40,7 @@ def gen_data(csv_file, db):
 
 		path = db + '/' + img[0]
 		im = Image.open(path).convert('RGB')
-		#data.addSample(get_img_feats(im), get_keyword_class(keywords[img[1]], n))
 		X.append(get_img_feats(im))
 		y.append(keywords[img[1]])
 
 	return X, y, n, keywords
-	#return data, n, keywords

@@ -1,18 +1,14 @@
 from threading import Thread, Lock
 from sys import argv
 
-import socket, os, sys
+import socket, sys
 import configparser
 import time
 
-from classifier import *
 from features import *
-
 from sklearn import svm
 
-global parser
-global nn, n, ckeywords
-global svm_clf
+global ckeywords, svm_clf
 
 class Result:
 	def set_size(self, _size):
@@ -40,13 +36,10 @@ def image_search(path):
 
 	im = im.convert('RGB')
 	feats = get_img_feats(im)
-	#out = nn.activate(feats)
-	#clss = process_nn_output(out, ckeywords)
 	out = svm_clf.predict([feats])
-	clss = process_svm_output(out, ckeywords)
-	return clss
+	return process_svm_output(out, ckeywords)
 
-def spark_thread(ip, port, request, result):
+def mysql_thread(ip, port, request, result):
 	s = socket.socket()
 
 	try:
@@ -83,7 +76,7 @@ def client_thread(c, request):
 	for i in range(clusters):
 		ip = parser.get('config', 'ip' + str(i))
 		port = parser.get('config', 'port' + str(i))
-		threads.append(Thread(target=spark_thread, args=(ip, port, request, result, )))
+		threads.append(Thread(target=mysql_thread, args=(ip, port, request, result, )))
 		threads[i].start()
 
 	for i in range(clusters):
@@ -125,20 +118,20 @@ def server():
 
 	s.close()
 
-def neural_network():
-	global nn, ckeywords
-	#data, n, ckeywords = gen_data(os.getcwd() + '/train.csv', os.getcwd() + '/.images')
-	nn = gen_nn(768, n, n)
-	nn = train_nn(data, nn, 10)
+def process_svm_output(svm_out, keywords):
+	for key, value in keywords.items():
+		if value == svm_out:
+			return key
 
 def svm_classifier():
 	global svm_clf, ckeywords
-	X, y, n, ckeywords = gen_data(os.getcwd() + '/train.csv', os.getcwd() + '/.images')
+	X, y, n, ckeywords = gen_data('/train.csv', '/.images')
 	print('Creating SVM Classifier...')
 	svm_clf = svm.SVC()
 	print('Training SVM classifier...')
 	svm_clf.fit(X, y)
 	print('Ready for classification...')
+	complete_benchmark()
 
 def complete_benchmark():
 	f = open('dataset.csv')
@@ -171,6 +164,5 @@ def read_conf():
 
 if __name__ == '__main__':
 	svm_classifier()
-	complete_benchmark()
-	#read_conf()
-	#server()
+	read_conf()
+	server()
