@@ -24,6 +24,8 @@ def gen_data(csv_file, db):
 	keywords = {}
 	count = 0
 	img_list = []
+	X = []
+	y = []
 
 	with open(csv_file) as f:
 		content = f.readlines()
@@ -46,6 +48,9 @@ def gen_data(csv_file, db):
 
 		path = db + '/' + img[0]
 		im = Image.open(path).convert('RGB')
-		data.addSample(get_img_feats(im), get_keyword_class(keywords[img[1]], n))
+		#data.addSample(get_img_feats(im), get_keyword_class(keywords[img[1]], n))
+		X.append(get_img_feats(im))
+		y.append(keywords[img[1]])
 
-	return data, n, keywords
+	return X, y, n, keywords
+	#return data, n, keywords

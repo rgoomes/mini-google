@@ -8,8 +8,11 @@ import time
 from classifier import *
 from features import *
 
+from sklearn import svm
+
 global parser
 global nn, n, ckeywords
+global svm_clf
 
 class Result:
 	def set_size(self, _size):
@@ -28,7 +31,7 @@ class Result:
 		self.mutex = Lock()
 
 def image_search(path):
-	global nn, ckeywords, response
+	global nn, ckeywords, response, svm_clf
 
 	try:
 		im = Image.open(path)
@@ -37,8 +40,10 @@ def image_search(path):
 
 	im = im.convert('RGB')
 	feats = get_img_feats(im)
-	out = nn.activate(feats)
-	clss = process_nn_output(out, ckeywords)
+	#out = nn.activate(feats)
+	#clss = process_nn_output(out, ckeywords)
+	out = svm_clf.predict([feats])
+	clss = process_svm_output(out, ckeywords)
 	return clss
 
 def spark_thread(ip, port, request, result):
@@ -122,9 +127,37 @@ def server():
 
 def neural_network():
 	global nn, ckeywords
-	data, n, ckeywords = gen_data(os.getcwd() + '/train.csv', os.getcwd() + '/.images')
+	#data, n, ckeywords = gen_data(os.getcwd() + '/train.csv', os.getcwd() + '/.images')
 	nn = gen_nn(768, n, n)
 	nn = train_nn(data, nn, 10)
+
+def svm_classifier():
+	global svm_clf, ckeywords
+	X, y, n, ckeywords = gen_data(os.getcwd() + '/train.csv', os.getcwd() + '/.images')
+	print('Creating SVM Classifier...')
+	svm_clf = svm.SVC()
+	print('Training SVM classifier...')
+	svm_clf.fit(X, y)
+	print('Ready for classification...')
+
+def complete_benchmark():
+	f = open('dataset.csv')
+	lines = f.readlines()
+	aux = []
+	out = []
+	for l in lines:
+		k = l.replace('\n', '').split(',')
+		if k[1] not in aux:
+			aux.append(k[1])
+			out.append(k[0])
+
+	true_count = 0
+	for k in range(len(out)):
+		cl = image_search('.images/' + out[k])
+		print('Expected: ' + aux[k] + ' | Classified: ' + cl)
+		if aux[k] == cl:
+			true_count += 1
+	print('Accuracy: ' + str(float(true_count) / len(out) * 100) + '%')
 
 def read_conf():
 	if "--conf" not in sys.argv or sys.argv.index('--conf')+1 == len(sys.argv):
@@ -137,6 +170,7 @@ def read_conf():
 	parser.read(conf_file)
 
 if __name__ == '__main__':
-	#neural_network()
-	read_conf()
-	server()
+	svm_classifier()
+	complete_benchmark()
+	#read_conf()
+	#server()

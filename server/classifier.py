@@ -17,6 +17,11 @@ def process_nn_output(nn_out, keywords):
 		if value == ind:
 			return key
 
+def process_svm_output(svm_out, keywords):
+	for key, value in keywords.items():
+		if value == svm_out:
+			return key
+
 def gen_nn(in_size, hidden_size, out_size):
 	nn = FeedForwardNetwork()
 
@@ -54,4 +59,23 @@ def benchmark(nn, keywords, db_path):
 			else:
 				neg += 1	
 	print('Overall Performance: ' + str((pos / (pos + neg)) * 100) + '%')
+
+def complete_benchmark():
+	f = open('dataset.csv')
+	lines = f.readlines()
+	aux = []
+	out = []
+	for l in lines:
+		k = l.replace('\n', '').split(',')
+		if k[1] not in aux:
+			aux.append(k[1])
+			out.append(k[0])
+
+	true_count = 0
+	for k in range(len(out)):
+		cl = image_search('.images/' + out[k])
+		print('Expected: ' + aux[k] + ' | Classified: ' + cl)
+		if aux[k] == cl:
+			true_count += 1
+	print('Accuracy: ' + str(float(true_count) / len(out) * 100) + '%')
 	
