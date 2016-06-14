@@ -3,7 +3,6 @@ var exec = Npm.require("child_process").exec;
 var fs = Npm.require('fs');
 
 var pwd = process.env.PWD;
-var spark_path = "/server/.spark-1.6.0-bin-hadoop2.6/";
 var server_images = "/server/.images/";
 var server_path = "/server"
 
@@ -55,7 +54,7 @@ Meteor.methods({
 
 		exec(cmd, function(error, stdout, stderr){
 			if(error){
-				console.log('error: client spark failed');
+				console.log('error: client mysql failed');
 				future.return([[], 0, 0]);
 			} else {
 				if(stdout == null || stdout.length == 0)

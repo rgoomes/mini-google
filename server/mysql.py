@@ -1,5 +1,5 @@
 from __future__ import print_function
-import socket, sys, os, MySQLdb, itertools
+import socket, sys, os, MySQLdb, itertools, random
 import ConfigParser as configparser
 from threading import Thread
 from math import floor
@@ -14,21 +14,29 @@ def print_status(table, pos, length):
 		print(end='\n')
 
 def keyword_search(keywords):
-	cmd = "SELECT name FROM image WHERE keyword = \'" + keywords[0] + "\' "
+	count_cmd  = "SELECT count(*) FROM image WHERE "
+	select_cmd = "SELECT name FROM image WHERE "
+	limit_cmd  = " LIMIT 100 "
+
+	keyword_cmd = "keyword = \'" + keywords[0] + "\' "
 	for i in range(1, len(keywords)):
-		cmd += "OR keyword = \'" + keywords[i] + "\' "
+		keyword_cmd += "OR keyword = \'" + keywords[i] + "\' "
 
-	cur.execute(cmd)
+	cur.execute(count_cmd + keyword_cmd + ";")
 	fetch = cur.fetchall()
-	results = str(len(fetch)) + "\n"
+	results = str(int(fetch[0][0])) + "\n"
 
-	for i in range(min(len(fetch), 100)):
+	cur.execute(select_cmd + keyword_cmd + limit_cmd + ";")
+	fetch = cur.fetchall()
+	conn.commit()
+
+	for i in random.sample(range(len(fetch)), len(fetch)):
 		results += str(fetch[i][0]) + " "
 
 	return results[:-1]
 
 def client_thread(cs):
-	job = cs.recv(1024).decode()
+	job = cs.recv(8192).decode()
 	print('Request received: ' + job)
 	job = job.split(" ")
 	results = keyword_search(job)

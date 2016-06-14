@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#usage example 1: python client.py keyword orange
+#usage example 1: python client.py keyword orange apple
 #usage example 2: python client.py image /path
 
 from socket import socket, gethostname
@@ -15,7 +15,7 @@ if len(argv) >= 2 and len(argv[1]):
 
 	s.send(keywords[:-1].encode())
 
-	data = s.recv(4096)
+	data = s.recv(8192)
 	print(data.decode(), end="")
 	s.close()
 

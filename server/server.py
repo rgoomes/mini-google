@@ -50,7 +50,7 @@ def mysql_thread(ip, port, request, result):
 		return
 
 	s.send(request.encode())
-	data = s.recv(4096)
+	data = s.recv(8192)
 	data = data.decode()
 	data = data.split('\n')
 
@@ -99,7 +99,7 @@ def server():
 
 	while True:
 		c, addr = s.accept()
-		job = c.recv(1024).decode().split(" ")
+		job = c.recv(8192).decode().split(" ")
 
 		if job[0] == "exit":
 			c.close()
