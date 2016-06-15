@@ -1,5 +1,5 @@
-import os, sys
-from PIL import *
+import os, sys, PIL
+from PIL import Image
 
 def print_status(table, pos, length):
 	sys.stdout.write("\033[K\r" + table + " " + str(pos) + "/" + str(length))

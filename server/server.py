@@ -1,12 +1,13 @@
 from threading import Thread, Lock
 from sys import argv
 
-import socket, sys
+import socket, sys, os
 import configparser
 import time
 
 from features import *
 from sklearn import svm
+from PIL import Image
 
 global ckeywords, svm_clf
 
@@ -125,7 +126,7 @@ def process_svm_output(svm_out, keywords):
 
 def svm_classifier():
 	global svm_clf, ckeywords
-	X, y, n, ckeywords = gen_data('/train.csv', '/.images')
+	X, y, n, ckeywords = gen_data(os.getcwd() + '/train.csv', os.getcwd() + '/.images')
 	print('Creating SVM Classifier...')
 	svm_clf = svm.SVC()
 	print('Training SVM classifier...')
